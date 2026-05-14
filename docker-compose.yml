@@ -1,0 +1,26 @@
+services:
+  neo4j:
+    image: neo4j:5.26
+    container_name: sysbio-neo4j
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      - NEO4J_AUTH=neo4j/neo4j_password
+      - NEO4J_PLUGINS=["apoc"]
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+
+  cobrapy-mcp:
+    build:
+      context: ./mcp-servers/cobrapy-server
+    container_name: cobrapy-mcp
+    ports:
+      - "5001:5001"
+    depends_on:
+      - neo4j
+
+volumes:
+  neo4j_data:
+  neo4j_logs:
