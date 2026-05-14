@@ -1,52 +1,85 @@
-## Provide established Metabolic Systems Biology tooling for reconstruction and analysis for LLMs 
+# SysBio LLM Tools (GSoC High-Level Implementation)
 
-### Background
-Reconstruction and subsequent network analysis are the fundamental processes of the systems biology of genome-scale metabolic models (GEMs). A plethora of tools exist in this space, and some of them emerged as the de facto standards (specifically [COBRApy](https://github.com/opencobra/cobrapy), [CarveMe](https://github.com/cdanielmachado/carveme), [MEMOTE](https://github.com/opencobra/memote), [Cytoscape](https://github.com/cytoscape/cytoscape)). The skillful and creative usage of these tools is a prerequisite for reliable knowledge extraction and fruitful hypothesis generation using GEMs.
+This repository provides a practical implementation baseline for the GSoC project:
+"Provide established Metabolic Systems Biology tooling for reconstruction and analysis for LLMs."
 
-GEMs are graph data structures that are well-suited for loading to and querying from a graph database. Consequently, tooling to load SBML into Neo4J ([Neo4JSBML](https://github.com/brsynth/neo4jsbml)) has been developed.
- 
-The dominant open standards for LLM tool usage currently are the Model Context Protocol ([MCP](https://www.anthropic.com/news/model-context-protocol)) and the SKILLS.md mechanism(an intro can be found [here](https://gofastmcp.com/servers/providers/skills)). These standards are designed as lightweight mechanisms to allow LLM agents to call external software tools in pursuit of a given goal. MCP server-based tools suffer from a context bloat problem that can be mitigated using dynamic tool detection. The most important software tools in systems biology currently have no integrations available to make them available to LLM agents. Neo4J has an [official](https://neo4j.com/developer/genai-ecosystem/model-context-protocol-mcp/#neo4j) MCP server that allows an LLM to query and manipulate graph databases.
+The project goal is not to replace systems biology modeling with LLMs, but to reduce setup and workflow friction by exposing deterministic GEM tooling through:
+- Model Context Protocol (MCP) servers
+- `SKILLS.md` documentation interfaces
 
-GEMs, like all formal models, have large potentials as curated, focused organism databases, as well as hypothesis generating oracles. Unlike with LLMs, their "responses" are fundamentally deterministic and mechanistic, grounded in knowledge. Their accessibility and usability however is severely limited by the sheer complexity and number of tools and databases involved. Furthermore, the idiosyncratic nature of lines of inquiry into a model usually means each analysis is (at least partially) as unique a gem as the GEM it investigates.
+## What Is Implemented Now
 
-### Goal
-In this project, LLMs are not supposed to replace systems biology modeling, but to lower the cost of doing it correctly.
-
-1. MCP Servers and/or SKILLS.md documentation for at least these reconstruction and analysis tools are made available:
+- Repository scaffold for all required tools:
 - CarveMe
 - COBRApy
 - MEMOTE
-- [refineGEMs](https://github.com/draeger-lab/refinegems)
-- [Neo4JSBML](https://github.com/brsynth/neo4jsbml?tab=readme-ov-file)
+- refineGEMs
 - Cytoscape
 
-2. A portable project setup (docker-compose.yml in case of MCP, clonable repo in case of skills + Neo4J database and MCP container setup) is made available, to enable users to start using these tools as a framework for interacting with GEMs using LLMs with minimal setup.
+- Working MCP prototype:
+- `mcp-servers/cobrapy-server/` (Flask-based, tool-style endpoints)
 
-3.  This setup is used in conjunction with the [OpenCode](https://opencode.ai) LLM agent framework that supports both MCP and SKILLS.md. A proof of concept reconstruction and analysis of a bacterial metabolic network are performed.
+- Portable baseline runtime:
+- `docker-compose.yml` with Neo4j + COBRApy MCP server
 
-### Difficulty Level: Easy/Medium/Hard
-**Medium** difficulty. The implementation itself is easy, but there is a large number of concepts involved in understanding the different parts that have to play together.
+- High-level project docs:
+- `QUICKSTART.md`
+- `PROJECT_STRUCTURE.md`
+- `docs/GSOC_IMPLEMENTATION_PLAN.md`
+- `examples/poc_bacterial_workflow.md`
 
-MCP servers are fundamentally HTTP wrappers around given functionality and their implementation is usually easy. SKILLS.md fundamentally uses documentation of tools, which can to a large degree be extracted and adapted from existing documentation. Both processes lend themselves exceedingly well to LLM-assistance.
+## Architecture (High Level)
 
-The greatest difficulty in the project lies in the understanding and evaluation of the LLM output and sufficient understanding of the involved tools and data structures.
+1. LLM agent calls MCP tools and/or uses `SKILLS.md` guidance.
+2. Tool servers execute deterministic systems biology operations.
+3. Artifacts (SBML, reports, summaries) are produced.
+4. Optional graph layer (Neo4j) supports network-centric queries.
 
-### Size and Length of Project
-- medium: 175
-- 12 weeks
+## Current Repository Layout
 
-### Skills
-List skills/technologies that the student should be familiar with. Also tag the issue with these.
+```
+sysbio-llm-tools/
+├── docs/
+├── examples/
+├── learning/
+├── mcp-servers/
+│   └── cobrapy-server/
+├── skills/
+│   ├── carveme/
+│   ├── cobrapy/
+│   ├── cytoscape/
+│   ├── memote/
+│   └── refinegems/
+├── docker-compose.yml
+├── PROJECT_STRUCTURE.md
+├── QUICKSTART.md
+└── README.md
+```
 
-**Essential skills:** 
-- Programming proficiency (pref. Python)
-- HTTP APIs (i.e. fundamental HTTP concepts (methods, routes), JSON, some experience programming a server, for example using Flask)
-**Nice to have skills:**
-- Docker
-- Proficiency with at least one visualization library (pref. ggplot or Vega-Lite)
-- OpenAPI/Swagger (for Cytoscape REST)
+## Quick Start
 
-### AI Usage Policy
-We welcome the use of AI tools by users who are capable and have proven expertise in the field they are using AIs for. We care first and foremost about the characteristics of the software artifact. That is, code needs to do exactly what it is supposed to, not "be written by a human". It needs to be maintainable, not "be pretty".
+```bash
+docker compose up -d neo4j cobrapy-mcp
+curl http://localhost:5001/health
+curl http://localhost:5001/tools
+```
 
-We therefore explicitly encourage participants to use AI tools, as long as they are capable and prepared to responsibly review and integrate the generated code.
+See `QUICKSTART.md` for full setup details.
+
+## Planned Work for Full GSoC Scope
+
+- Implement MCP servers (or tool wrappers) for:
+- CarveMe (async reconstruction jobs)
+- MEMOTE (quality reports and summaries)
+- refineGEMs (curation/refinement)
+- Cytoscape (REST-driven network visualization)
+
+- Integrate SBML to Neo4j workflow (Neo4JSBML strategy).
+- Provide one reproducible bacterial reconstruction + analysis PoC.
+
+Detailed execution plan is in `docs/GSOC_IMPLEMENTATION_PLAN.md`.
+
+## Notes
+
+- `_sample-repo/` is preserved as reference material.
+- The top-level implementation is intentionally high-level and review-friendly for iterative expansion during GSoC.
