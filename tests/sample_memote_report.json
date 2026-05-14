@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "timestamp": "2026-04-03T08:00:00",
+    "model_id": "test_bacteria_model"
+  },
+  "tests": {
+    "test_stoichiometric_consistency": {
+      "title": "Stoichiometric Consistency",
+      "summary": "This model fails stoichiometric consistency. It produces mass out of nothing.",
+      "result": "Failed",
+      "metric": 0.0,
+      "data": ["reaction_A", "reaction_B"]
+    },
+    "test_mass_balance": {
+      "title": "Mass Balance",
+      "summary": "These reactions are not mass balanced.",
+      "result": "Failed",
+      "metric": 0.5,
+      "data": ["reaction_C"]
+    },
+    "test_find_metabolites_without_formula": {
+      "title": "Metabolite Formula Presence",
+      "summary": "All metabolites have formulas.",
+      "result": "Passed",
+      "metric": 1.0,
+      "data": []
+    }
+  }
+}
