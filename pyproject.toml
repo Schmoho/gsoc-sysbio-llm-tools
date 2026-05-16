@@ -1,7 +1,12 @@
 [project]
 name = "sysbio-llm-tools"
 version = "0.1.0"
-description = "Add your description here"
+description = "Metabolic Systems Biology tooling for reconstruction and analysis for LLMs."
 readme = "README.md"
-requires-python = ">=3.14"
-dependencies = []
+requires-python = ">=3.10"
+dependencies = [
+    "Flask>=3.0.2",
+    "Werkzeug>=3.0.1",
+    "cobra>=0.30.0",
+    "requests"
+]

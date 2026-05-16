@@ -9,48 +9,54 @@ The project goal is not to replace systems biology modeling with LLMs, but to re
 
 ## What Is Implemented Now
 
-- Repository scaffold for all required tools:
-- CarveMe
-- COBRApy
-- MEMOTE
-- refineGEMs
-- Cytoscape
+- **Unified MCP Architecture:**
+  - Central orchestrator at `mcp_server_core/`
+  - Individual tool servers: COBRApy, Neo4JSBML, and MEMOTE.
 
-- Working MCP prototype:
-- `mcp-servers/cobrapy-server/` (Flask-based, tool-style endpoints)
+- **Repository scaffold for all required tools:**
+  - CarveMe
+  - COBRApy
+  - MEMOTE
+  - refineGEMs
+  - Cytoscape
 
-- Portable baseline runtime:
-- `docker-compose.yml` with Neo4j + COBRApy MCP server
+- **Portable baseline runtime:**
+  - Unified `docker-compose.yml` deploying Neo4j, the COBRApy tool server, and the central MCP orchestrator.
 
-- High-level project docs:
-- `QUICKSTART.md`
-- `PROJECT_STRUCTURE.md`
-- `docs/GSOC_IMPLEMENTATION_PLAN.md`
-- `examples/poc_bacterial_workflow.md`
+- **High-level project docs:**
+  - `QUICKSTART.md`
+  - `PROJECT_STRUCTURE.md`
+  - `docs/GSOC_IMPLEMENTATION_PLAN.md`
+  - `examples/poc_bacterial_workflow.md`
 
 ## Architecture (High Level)
 
-1. LLM agent calls MCP tools and/or uses `SKILLS.md` guidance.
+1. LLM agent calls MCP tools via the central orchestrator and/or uses `SKILLS.md` guidance.
 2. Tool servers execute deterministic systems biology operations.
 3. Artifacts (SBML, reports, summaries) are produced.
 4. Optional graph layer (Neo4j) supports network-centric queries.
 
 ## Current Repository Layout
 
-```
+```text
 sysbio-llm-tools/
-├── docs/
 ├── examples/
 ├── learning/
-├── mcp-servers/
-│   └── cobrapy-server/
+├── mcp_server_core/          <-- Central Orchestrator
+├── mcp-servers/              <-- Individual Tool Servers
+│   ├── cobrapy-server/
+│   ├── memote_mcp.py
+│   └── neo4j_mcp.py
 ├── skills/
 │   ├── carveme/
 │   ├── cobrapy/
 │   ├── cytoscape/
 │   ├── memote/
+│   ├── neo4jsbml/
 │   └── refinegems/
-├── docker-compose.yml
+├── docker-compose.yml        <-- Unified Deployment Stack
+├── memote_filter.py
+├── pyproject.toml
 ├── PROJECT_STRUCTURE.md
 ├── QUICKSTART.md
 └── README.md
@@ -59,27 +65,26 @@ sysbio-llm-tools/
 ## Quick Start
 
 ```bash
-docker compose up -d neo4j cobrapy-mcp
-curl http://localhost:5001/health
-curl http://localhost:5001/tools
+docker compose up -d neo4j mcp-orchestrator cobrapy-mcp
+curl http://localhost:5000/health
+curl http://localhost:5000/mcp/tools
 ```
 
 See `QUICKSTART.md` for full setup details.
 
-## Planned Work for Full GSoC Scope
+## Community Roadmap
 
+- Containerize `memote_mcp.py` and `neo4j_mcp.py` to match the standard Docker deployment.
 - Implement MCP servers (or tool wrappers) for:
-- CarveMe (async reconstruction jobs)
-- MEMOTE (quality reports and summaries)
-- refineGEMs (curation/refinement)
-- Cytoscape (REST-driven network visualization)
+  - CarveMe (async reconstruction jobs)
+  - refineGEMs (curation/refinement)
+  - Cytoscape (REST-driven network visualization)
 
-- Integrate SBML to Neo4j workflow (Neo4JSBML strategy).
 - Provide one reproducible bacterial reconstruction + analysis PoC.
 
-Detailed execution plan is in `docs/GSOC_IMPLEMENTATION_PLAN.md`.
+Detailed execution plan is currently tracked in `docs/GSOC_IMPLEMENTATION_PLAN.md` (serving as our baseline roadmap).
 
 ## Notes
 
 - `_sample-repo/` is preserved as reference material.
-- The top-level implementation is intentionally high-level and review-friendly for iterative expansion during GSoC.
+- The top-level implementation is intentionally high-level and modular to encourage iterative expansion and easy peer review from all contributors.

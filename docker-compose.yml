@@ -1,4 +1,7 @@
+version: '3.8'
+
 services:
+  # 1. Graph Database
   neo4j:
     image: neo4j:5.26
     container_name: sysbio-neo4j
@@ -12,6 +15,18 @@ services:
       - neo4j_data:/data
       - neo4j_logs:/logs
 
+  # 2. Central MCP Orchestrator
+  mcp-orchestrator:
+    build:
+      context: ./mcp_server_core
+    container_name: mcp_wrapper_core
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+    restart: unless-stopped
+
+  # 3. Tool: COBRApy Server
   cobrapy-mcp:
     build:
       context: ./mcp-servers/cobrapy-server
@@ -20,6 +35,7 @@ services:
       - "5001:5001"
     depends_on:
       - neo4j
+      - mcp-orchestrator
 
 volumes:
   neo4j_data:
