@@ -2,51 +2,45 @@
 
 ## Repository Layout
 
-```
+```text
 sysbio-llm-tools/
-├── docs/
-│   └── GSOC_IMPLEMENTATION_PLAN.md
 ├── examples/
 │   └── poc_bacterial_workflow.md
 ├── learning/
-│   ├── NOTES.md
 │   ├── carveme_exploration.py
 │   ├── cobrapy_exploration.py
 │   └── memote_exploration.py
-├── mcp-servers/
-│   └── cobrapy-server/
-│       ├── Dockerfile
-│       ├── README.md
-│       ├── requirements.txt
-│       ├── server.py
-│       ├── test_server.py
-│       └── validate_server.py
+├── mcp_server_core/          <-- Central Orchestrator
+│   ├── Dockerfile
+│   ├── app.py
+│   └── requirements.txt
+├── mcp-servers/              <-- Individual Tool Servers
+│   ├── cobrapy-server/
+│   ├── memote_mcp.py
+│   └── neo4j_mcp.py
 ├── skills/
 │   ├── carveme/
-│   │   └── SKILLS.md
 │   ├── cobrapy/
-│   │   └── SKILLS.md
 │   ├── cytoscape/
-│   │   └── SKILLS.md
 │   ├── memote/
-│   │   └── SKILLS.md
+│   ├── neo4jsbml/
 │   └── refinegems/
-│       └── SKILLS.md
-├── docker-compose.yml
-├── LICENSE
+├── tests/
+├── docker-compose.yml        <-- Unified Deployment Stack
+├── memote_filter.py          
+├── pyproject.toml
 ├── QUICKSTART.md
 └── README.md
 ```
 
 ## Current Implementation Status
 
-- Implemented now:
-- `cobrapy-server` MCP prototype (Flask API).
-- Skills scaffolding for all required tools.
-- Portable container baseline with Neo4j + COBRApy MCP server.
-- Quickstart and implementation roadmap docs.
+- Unified Architecture: A central `mcp_server_core` orchestrates individual tool servers for the LLM agents.
+- Active Tools: COBRApy (FBA), Neo4JSBML (Graph Queries), and MEMOTE (Quality Filtering) are officially structured as independent MCP servers.
+- Deployment: A unified `docker-compose.yml` at the root directory manages the core infrastructure.
+- Skills: Scaffolding complete for all required tools.
 
 - Next implementation steps:
-- Add MCP servers for CarveMe, MEMOTE, refineGEMs, Cytoscape.
-- Integrate Neo4J MCP server container in compose stack.
+- Containerize memote_mcp.py and neo4j_mcp.py to match the cobrapy-server Docker standard.
+- Implement MCP servers for CarveMe (async processing), refineGEMs, and Cytoscape.
 - Add end-to-end proof-of-concept run for one bacterial network.

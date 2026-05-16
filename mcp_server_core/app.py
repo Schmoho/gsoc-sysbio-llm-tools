@@ -29,6 +29,34 @@ def list_tools():
                     },
                     "required": ["model_path"]
                 }
+            },
+            {
+                "name": "neo4jsbml_query",
+                "description": "Execute Cypher queries against the grounded Neo4j database to find metabolites, reactions, and gene associations.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "type": "string",
+                            "description": "The Cypher query to execute (e.g., MATCH (m:Metabolite) RETURN m)"
+                        }
+                    },
+                    "required": ["query"]
+                }
+            },
+            {
+                "name": "memote_filter",
+                "description": "Filters massive MEMOTE JSON reports to extract actionable failed tests, protecting the LLM context window.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "report_data": {
+                            "type": "object",
+                            "description": "The raw JSON dictionary of the MEMOTE report."
+                        }
+                    },
+                    "required": ["report_data"]
+                }
             }
         ]
     }
