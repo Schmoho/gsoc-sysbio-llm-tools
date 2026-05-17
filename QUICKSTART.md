@@ -4,29 +4,31 @@
 
 ```bash
 cd sysbio-llm-tools
-docker compose up -d neo4j cobrapy-mcp
+docker compose up -d neo4j mcp-orchestrator cobrapy-mcp memote-mcp
 ```
 
 Services:
 - Neo4j Browser: `http://localhost:7474`
 - Neo4j Bolt: `bolt://localhost:7687`
-- COBRApy MCP server: `http://localhost:5001`
+- Central MCP Orchestrator: `http://localhost:5000`
+- COBRApy MCP server (Internal): `http://localhost:5001`
+- MEMOTE MCP server (Internal): `http://localhost:5002`
 
 ## 2. Verify COBRApy MCP server
 
 ```bash
-curl http://localhost:5001/health
-curl http://localhost:5001/tools
+curl http://localhost:5000/health
+curl http://localhost:5000/mcp/tools
 ```
 
 ## 3. Run local validation (optional)
 
 ```bash
-cd mcp-servers/cobrapy-server
+cd mcp_server_core
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python validate_server.py
+python app.py
 ```
 
 ## 4. Review skills docs
@@ -36,7 +38,4 @@ python validate_server.py
 - `skills/memote/SKILLS.md`
 - `skills/refinegems/SKILLS.md`
 - `skills/cytoscape/SKILLS.md`
-
-## 5. Follow implementation roadmap
-
-Open `docs/GSOC_IMPLEMENTATION_PLAN.md` and execute by phase.
+- `skills/neo4jsbml/SKILLS.md`
