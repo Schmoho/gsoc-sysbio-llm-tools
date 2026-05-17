@@ -37,6 +37,16 @@ services:
       - neo4j
       - mcp-orchestrator
 
+  # 4. Tool: MEMOTE Server
+  memote-mcp:
+    build:
+      context: ./mcp-servers/memote-server
+    container_name: memote-mcp
+    ports:
+      - "5002:5002"
+    depends_on:
+      - mcp-orchestrator
+
 volumes:
   neo4j_data:
   neo4j_logs:

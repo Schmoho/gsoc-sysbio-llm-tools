@@ -9,25 +9,21 @@ The project goal is not to replace systems biology modeling with LLMs, but to re
 
 ## What Is Implemented Now
 
-- **Unified MCP Architecture:**
-  - Central orchestrator at `mcp_server_core/`
-  - Individual tool servers: COBRApy, Neo4JSBML, and MEMOTE.
+**Unified MCP Architecture:**
+- Central orchestrator at `mcp_server_core/`
+- Individual tool servers: COBRApy, Neo4JSBML, and MEMOTE.
 
-- **Repository scaffold for all required tools:**
-  - CarveMe
-  - COBRApy
-  - MEMOTE
-  - refineGEMs
-  - Cytoscape
+**Working MCP Microservices:**
+- `mcp-servers/cobrapy-server/` (Flask-based, tool-style endpoints)
+- `mcp-servers/memote-server/` (JSON filtering and parsing)
 
-- **Portable baseline runtime:**
-  - Unified `docker-compose.yml` deploying Neo4j, the COBRApy tool server, and the central MCP orchestrator.
+**Repository scaffold for remaining tools:**
+- CarveMe
+- refineGEMs
+- Cytoscape
 
-- **High-level project docs:**
-  - `QUICKSTART.md`
-  - `PROJECT_STRUCTURE.md`
-  - `docs/GSOC_IMPLEMENTATION_PLAN.md`
-  - `examples/poc_bacterial_workflow.md`
+**Portable baseline runtime:**
+- Unified `docker-compose.yml` deploying Neo4j, the central MCP orchestrator, COBRApy, and MEMOTE.
 
 ## Architecture (High Level)
 

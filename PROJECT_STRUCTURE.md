@@ -14,9 +14,16 @@ sysbio-llm-tools/
 │   ├── Dockerfile
 │   ├── app.py
 │   └── requirements.txt
-├── mcp-servers/              <-- Individual Tool Servers
+├── mcp-servers/                <-- Individual Tool Servers
 │   ├── cobrapy-server/
-│   ├── memote_mcp.py
+│   │   ├── Dockerfile
+│   │   ├── requirements.txt
+│   │   └── server.py
+│   ├── memote-server/          <-- New MEMOTE Microservice
+│   │   ├── Dockerfile
+│   │   ├── requirements.txt
+│   │   ├── server.py
+│   │   └── memote_filter.py
 │   └── neo4j_mcp.py
 ├── skills/
 │   ├── carveme/
