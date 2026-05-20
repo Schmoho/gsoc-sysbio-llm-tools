@@ -1,35 +1,49 @@
-from flask import Flask, request, jsonify
-import logging
+import traceback
+from fastmcp import FastMCP
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 from memote_filter import extract_actionable_errors
 
-app = Flask(__name__)
-logging.basicConfig(level=logging.INFO)
+# Initialize the FastMCP server
+mcp = FastMCP("memote-mcp")
 
-@app.route('/health', methods=['GET'])
-def health_check():
+# ============================================================================
+# Docker Health & Legacy Routes (Standard HTTP)
+# ============================================================================
+
+@mcp.custom_route("/health", methods=["GET"])
+async def health_check(request: Request) -> JSONResponse:
     """Health check for Docker orchestration."""
-    return jsonify({"status": "healthy", "service": "memote-mcp-server"}), 200
+    return JSONResponse({"status": "healthy", "service": "memote-mcp-server"})
 
-@app.route('/mcp/memote/filter', methods=['POST'])
-def filter_memote():
-    """Accepts a raw MEMOTE JSON report and applies smart truncation."""
+@mcp.custom_route("/mcp/memote/filter", methods=["POST"])
+async def filter_memote_route(request: Request) -> JSONResponse:
+    """Legacy POST endpoint to match existing SKILLS.md instructions."""
     try:
-        raw_report = request.get_json()
+        raw_report = await request.json()
         if not raw_report:
-            return jsonify({"error": "No JSON payload provided."}), 400
+            return JSONResponse({"error": "No JSON payload provided."}, status_code=400)
         
-        logging.info("Applying MEMOTE context filter...")
         optimized_report = extract_actionable_errors(raw_report)
-        
-        return jsonify({
-            "status": "success",
-            "data": optimized_report
-        }), 200
-        
+        return JSONResponse({"status": "success", "data": optimized_report})
     except Exception as e:
-        logging.error(f"Error during MEMOTE filtering: {e}")
-        return jsonify({"error": str(e)}), 500
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+# ============================================================================
+# LLM Tools (MCP Protocol)
+# ============================================================================
+
+@mcp.tool()
+def filter_memote_report(raw_report: dict) -> dict:
+    """
+    Accepts a raw MEMOTE JSON report (as a dictionary) and applies smart truncation.
+    Returns only the actionable errors to protect the LLM context window.
+    """
+    try:
+        return extract_actionable_errors(raw_report)
+    except Exception as e:
+        return {"error": str(e), "traceback": traceback.format_exc()}
 
 if __name__ == '__main__':
-    # Running on 0.0.0.0 is required for Docker
-    app.run(host='0.0.0.0', port=5002)
+    print("Starting FastMCP MEMOTE Server on port 5002...")
+    mcp.run(transport="sse", host="0.0.0.0", port=5002)
